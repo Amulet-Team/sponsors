@@ -2,6 +2,8 @@ from urllib.request import urlopen, Request
 import sys
 import json
 
+# List of sponsors that shouldn't be shown in the sponsor section
+HIDE = {"ADS-Fund"}
 
 def main(token: str):
     sponsors = []
@@ -34,7 +36,7 @@ def main(token: str):
         with req as f:
             response = json.loads(f.read().decode())
         sponsor_node = response["data"]["organization"]["sponsors"]
-        sponsors.extend(user["login"] for user in sponsor_node["nodes"])
+        sponsors.extend(user["login"] for user in sponsor_node["nodes"] if user["login"] not in HIDE)
         page_info = sponsor_node["pageInfo"]
         after = f'"{page_info["endCursor"]}"'
         has_next_page = page_info["hasNextPage"]
