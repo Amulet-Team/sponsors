@@ -2,7 +2,7 @@ from urllib.request import urlopen, Request
 import sys
 import json
 
-# List of sponsors that shouldn't be shown in the sponsor section
+# List of sponsors that shouldn't be shown in the sponsor section. Eg. accounts we suspect are related to scams.
 HIDE = {"ADS-Fund"}
 
 def main(token: str):
