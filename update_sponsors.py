@@ -12,11 +12,14 @@ def main(token: str):
     while has_next_page:
         query = """
         query {
-            organization (login:"Amulet-Team") {
-                sponsors(first: 100, after: AFTER) {
+            organization(login: "Amulet-Team") {
+                sponsorshipsAsMaintainer(first: 100, after: AFTER) {
                     nodes {
-                        ... on User { login }
-                        ... on Organization { login }
+                        sponsorEntity {
+                            ... on User { login }
+                            ... on Organization { login }
+                        }
+                        privacyLevel
                     }
                     pageInfo {
                         endCursor
@@ -35,8 +38,12 @@ def main(token: str):
         ))
         with req as f:
             response = json.loads(f.read().decode())
-        sponsor_node = response["data"]["organization"]["sponsors"]
-        sponsors.extend(user["login"] for user in sponsor_node["nodes"] if user["login"] not in HIDE)
+        sponsor_node = response["data"]["organization"]["sponsorshipsAsMaintainer"]
+        sponsors.extend(
+            user["sponsorEntity"]["login"]
+            for user in sponsor_node["nodes"]
+            if user["privacyLevel"] != "PRIVATE" and user["sponsorEntity"] is not None and user["sponsorEntity"]["login"] not in HIDE
+        )
         page_info = sponsor_node["pageInfo"]
         after = f'"{page_info["endCursor"]}"'
         has_next_page = page_info["hasNextPage"]
