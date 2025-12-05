@@ -38,6 +38,9 @@ def main(token: str):
         ))
         with req as f:
             response = json.loads(f.read().decode())
+        if "data" not in response:
+            print(response)
+            raise RuntimeError()
         sponsor_node = response["data"]["organization"]["sponsorshipsAsMaintainer"]
         sponsors.extend(
             user["sponsorEntity"]["login"]
